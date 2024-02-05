@@ -16,7 +16,7 @@ CREATE TABLE og_list(
     email text,
     social_medias text,
     review_count integer,
-    average_rating DECIMAL(1,1),
+    average_rating DECIMAL(2,1),
     review_url text,
     google_maps_url text,
     google_knowledge_url text,	
@@ -32,4 +32,4 @@ CREATE TABLE og_list(
 );
 
 
-ALTER TABLE og_list ALTER COLUMN average_rating TYPE DECIMAL(1,1) USING average_rating::DECIMAL(1,1); 
+ALTER TABLE og_list ALTER COLUMN average_rating TYPE DECIMAL(2,1) USING average_rating::DECIMAL(2,1); 
