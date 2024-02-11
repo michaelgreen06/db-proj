@@ -1,5 +1,5 @@
 CREATE TABLE og_list(
-    id serial PRIMARY KEY,
+    prospect_id serial PRIMARY KEY,
     name text, 
     fulladdress text,	
     street text,

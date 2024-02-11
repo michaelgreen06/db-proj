@@ -64,10 +64,10 @@
 
 WITH RankedDuplicates AS (
     SELECT
-        id,
+        prospect_id,
         ROW_NUMBER() OVER (
             PARTITION BY name, fulladdress, street, municipality, categories, plus_code, price, note, amenities, hotel_class, phone, phones, claimed, email, social_medias, review_count, average_rating, review_url, google_maps_url, google_knowledge_url, latitude, longitude, website, domain, opening_hours, featured_image, cid, place_id, kgmid
-            ORDER BY id
+            ORDER BY prospect_id
         ) AS rn
     FROM
         og_list_copy
@@ -75,8 +75,8 @@ WITH RankedDuplicates AS (
 DELETE FROM
     og_list_copy
 WHERE
-    id IN (
-        SELECT id FROM RankedDuplicates WHERE rn > 1
+    prospect_id IN (
+        SELECT prospect_id FROM RankedDuplicates WHERE rn > 1
     );
 
 
@@ -84,10 +84,10 @@ WHERE
 
 WITH RankedDuplicates AS (
     SELECT
-        id,
+        prospect_id,
         ROW_NUMBER() OVER (
             PARTITION BY name, fulladdress, phone, email, website
-            ORDER BY id
+            ORDER BY prospect_id
         ) AS rn
     FROM
         og_list_copy
@@ -96,8 +96,8 @@ DELETE FROM
     og_list_copy
 WHERE
     id IN (
-        SELECT id FROM RankedDuplicates WHERE rn > 1
-    );
+        SELECT prospect_id FROM RankedDuplicates WHERE rn > 1
+    );re
 
 --TESTING RESULTS
 SELECT * FROM og_list_copy WHERE name = 'Wild Bill''s Tobacco';
