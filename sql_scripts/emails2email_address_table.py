@@ -1,3 +1,8 @@
+# sql code to update the email column in prospects to migrated after this code is run
+# ALTER TABLE prospects ADD COLUMN emails_migrated BOOLEAN DEFAULT FALSE;
+# UPDATE prospects SET emails_migrated = TRUE WHERE email IS NOT NULL AND email <> '';
+
+
 #!/usr/bin/env python3
 
 import psycopg2
