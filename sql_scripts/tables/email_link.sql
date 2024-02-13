@@ -1,0 +1,1 @@
+--table to create relationship between email string and prospect_id
