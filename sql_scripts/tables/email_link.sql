@@ -62,6 +62,7 @@ COPY (
 --same as above but only exporting valid email addresses
 --may contain multiple email addresses for 1 prospect_id
 --exported 1146
+--works the best so far
 COPY (
     WITH UniqueValidEmails AS (
         SELECT email_address, MIN(prospect_id) AS unique_prospect_id
@@ -73,7 +74,7 @@ COPY (
     SELECT uve.email_address, uve.unique_prospect_id, p.name, p.municipality, p.categories, p.average_rating, p.website
     FROM UniqueValidEmails uve
     JOIN prospects p ON uve.unique_prospect_id = p.prospect_id
-) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/1_store_prospects.csv' WITH CSV HEADER;
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/1a_store_prospects.csv' WITH CSV HEADER;
 
 --same as above but only exports the 1st email_address associated with a prospect_id
 exported 2079
@@ -89,3 +90,29 @@ COPY (
     FROM FirstValidEmailPerProspect fvepp
     JOIN prospects p ON fvepp.prospect_id = p.prospect_id
 ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/1_store_prospects.csv' WITH CSV HEADER;
+
+--exports 2079 email_address's the same email addresss appears multiple times
+COPY (
+    WITH FirstValidEmailPerProspect AS (
+        SELECT DISTINCT ON (prospect_id) prospect_id, email_address
+        FROM email_addresses
+        WHERE email_validation_status = 'valid'
+        ORDER BY prospect_id, email_address -- or any other column to determine the "first" email
+    )
+    SELECT fvepp.email_address, fvepp.prospect_id, p.name, p.municipality, p.categories, p.average_rating, p.website
+    FROM FirstValidEmailPerProspect fvepp
+    JOIN prospects p ON fvepp.prospect_id = p.prospect_id
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/1_store_prospects.csv' WITH CSV HEADER;
+
+--
+COPY (
+    WITH FirstValidEmailPerProspect AS (
+        SELECT DISTINCT ON (prospect_id) prospect_id, email_address
+        FROM email_addresses
+        WHERE email_validation_status = 'valid'
+        ORDER BY prospect_id, email_address -- Orders alphabetically to pick the first email
+    )
+    SELECT fvepp.email_address, fvepp.prospect_id, p.name, p.municipality, p.categories, p.average_rating, p.website
+    FROM FirstValidEmailPerProspect fvepp
+    JOIN prospects p ON fvepp.prospect_id = p.prospect_id
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/unique1/unique1.csv' WITH CSV HEADER;
