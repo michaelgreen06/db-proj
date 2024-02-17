@@ -104,7 +104,9 @@ COPY (
     JOIN prospects p ON fvepp.prospect_id = p.prospect_id
 ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/1_store_prospects.csv' WITH CSV HEADER;
 
---
+
+
+------attempting to export only the 1st email address associated with 1 prospect_id
 COPY (
     WITH FirstValidEmailPerProspect AS (
         SELECT DISTINCT ON (prospect_id) prospect_id, email_address
@@ -116,3 +118,107 @@ COPY (
     FROM FirstValidEmailPerProspect fvepp
     JOIN prospects p ON fvepp.prospect_id = p.prospect_id
 ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/unique1/unique1.csv' WITH CSV HEADER;
+
+------attempting to export only the 1st email address associated with 1 prospect_id
+COPY (
+    WITH RankedEmails AS (
+        SELECT
+            email_address,
+            prospect_id,
+            ROW_NUMBER() OVER(PARTITION BY prospect_id ORDER BY email_address) AS email_rank
+        FROM
+            email_addresses
+        WHERE
+            email_validation_status = 'valid'
+    ),
+    SecondEmails AS (
+        SELECT
+            email_address,
+            prospect_id
+        FROM
+            RankedEmails
+        WHERE
+            email_rank = 1
+    )
+    SELECT
+        se.email_address,
+        se.prospect_id,
+        p.name,
+        p.municipality,
+        p.categories,
+        p.average_rating,
+        p.website
+    FROM
+        SecondEmails se
+        JOIN prospects p ON se.prospect_id = p.prospect_id
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/unique1.csv' WITH CSV HEADER;
+
+
+
+------attempting to export only the 2nd email address associated with 1 prospect_id
+COPY (
+    WITH RankedEmails AS (
+        SELECT
+            email_address,
+            prospect_id,
+            ROW_NUMBER() OVER(PARTITION BY prospect_id ORDER BY email_address) AS email_rank
+        FROM
+            email_addresses
+        WHERE
+            email_validation_status = 'valid'
+    ),
+    SecondEmails AS (
+        SELECT
+            email_address,
+            prospect_id
+        FROM
+            RankedEmails
+        WHERE
+            email_rank = 2
+    )
+    SELECT
+        se.email_address,
+        se.prospect_id,
+        p.name,
+        p.municipality,
+        p.categories,
+        p.average_rating,
+        p.website
+    FROM
+        SecondEmails se
+        JOIN prospects p ON se.prospect_id = p.prospect_id
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/unique2.csv' WITH CSV HEADER;
+
+------attempting to export only the 3rd email address associated with 1 prospect_id
+COPY (
+    WITH RankedEmails AS (
+        SELECT
+            email_address,
+            prospect_id,
+            ROW_NUMBER() OVER(PARTITION BY prospect_id ORDER BY email_address) AS email_rank
+        FROM
+            email_addresses
+        WHERE
+            email_validation_status = 'valid'
+    ),
+    SecondEmails AS (
+        SELECT
+            email_address,
+            prospect_id
+        FROM
+            RankedEmails
+        WHERE
+            email_rank = 3
+    )
+    SELECT
+        se.email_address,
+        se.prospect_id,
+        p.name,
+        p.municipality,
+        p.categories,
+        p.average_rating,
+        p.website
+    FROM
+        SecondEmails se
+        JOIN prospects p ON se.prospect_id = p.prospect_id
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/unique3.csv' WITH CSV HEADER;
