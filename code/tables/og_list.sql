@@ -30,6 +30,3 @@ CREATE TABLE og_list(
     place_id text,	
     kgmid text
 );
-
-
-ALTER TABLE og_list ALTER COLUMN average_rating TYPE DECIMAL(2,1) USING average_rating::DECIMAL(2,1); 

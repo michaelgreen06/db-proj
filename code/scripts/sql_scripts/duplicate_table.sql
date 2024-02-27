@@ -6,10 +6,3 @@ INSERT INTO email_addresses_bu SELECT * FROM email_addresses;
 --this command copies the table without constraints
 CREATE TABLE prospects AS TABLE og_list_copy;
 
---rename id column to prospect_id
-ALTER TABLE prospects RENAME COLUMN id TO prospect_id;
-
---clasissifying prospect_id as primary key
-ALTER TABLE prospects
-ADD CONSTRAINT prospect_id_pk PRIMARY KEY (prospect_id);
-
