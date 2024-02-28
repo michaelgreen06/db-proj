@@ -1,13 +1,14 @@
 CREATE TABLE locations (
     location_id SERIAL PRIMARY KEY,
     city VARCHAR(255),
-    state CHAR(2),
+    state VARCHAR(255),
     zipcode VARCHAR(10),
     prospect_id INTEGER,
     CONSTRAINT fk_prospect_id FOREIGN KEY (prospect_id) REFERENCES prospects(prospect_id)
 );
 
 --copy data from prospects table and exclude prospect_id's that have improperly formatted municipality fields
+--Find these prospect_ids by ordering the prospects table by municipality
 WITH excluded_prospects AS (
     SELECT unnest(ARRAY[
         4123, 5132, 6247, 16044, 12980, 12515, 13977, 18166, 16626, 12610, 
@@ -30,8 +31,8 @@ WITH excluded_prospects AS (
 INSERT INTO locations (city, state, zipcode, prospect_id)
 SELECT
     TRIM(SPLIT_PART(municipality, ',', 1)) AS city,
-    TRIM(SPLIT_PART(SPLIT_PART(municipality, ',', 2), ' ', 1)) AS state,
-    TRIM(SPLIT_PART(municipality, ' ', -1)) AS zipcode,
+    TRIM(SPLIT_PART(TRIM(SPLIT_PART(municipality, ',', 2)), ' ', 1)) AS state, 
+    TRIM(SPLIT_PART(TRIM(SPLIT_PART(municipality, ',', 2)), ' ', 2)) AS zipcode,
     p.prospect_id
 FROM
     prospects p

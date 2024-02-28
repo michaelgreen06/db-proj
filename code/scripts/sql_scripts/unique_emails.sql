@@ -27,9 +27,9 @@ CREATE TABLE prospect_email_link (
 
 -- Step 6: Populate the `prospect_email_link` Table
 INSERT INTO prospect_email_link (prospect_id, email_id)
-SELECT ea.prospect_id, e.email_id
+SELECT ea.prospect_id, ue.email_id
 FROM email_addresses ea
 JOIN unique_emails ue ON ea.email_address = ue.email_address;
 
---2-27-24 ^^^a lot of this above code could need fixing because I chnanged the table names and am not sure 
+--2-27-24 ^^^this above code could need fixing because I chnanged the table names and am not sure 
 --I didn't miss any renaming. it should be an easy fix if there is a prob!
