@@ -9,6 +9,3 @@ CREATE TABLE email_addresses (
     unsubscribed BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (prospect_id) REFERENCES prospects(prospect_id)
 );
-
-
-
