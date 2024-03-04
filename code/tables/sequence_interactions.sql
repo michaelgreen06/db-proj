@@ -5,7 +5,7 @@ CREATE TABLE sequence_interactions (
     sent_emails SMALLINT,
     email_opens SMALLINT,
     link_clicks SMALLINT,
-    email_replies SMALLINT
-    FOREIGN KEY (email_id) REFERENCES email_addresses(email_id),
+    email_replies SMALLINT,
+    FOREIGN KEY (email_id) REFERENCES unique_emails(email_id),
     FOREIGN KEY (sequence_id) REFERENCES email_sequences(sequence_id)
 );

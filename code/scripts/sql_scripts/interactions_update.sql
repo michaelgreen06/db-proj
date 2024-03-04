@@ -13,8 +13,8 @@ CREATE TEMP TABLE temp_sequence_interactions (
 COPY temp_sequence_interactions FROM '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/sequence_interactions/cocv0.csv' DELIMITER ',' CSV HEADER;
 
 INSERT INTO sequence_interactions (email_id, sequence_id, sent_emails, email_opens, link_clicks, email_replies)
-SELECT
-    pel.email_id,
+SELECT 
+    ue.email_id,
     tmp.sequence_id, 
     tmp.sent_emails,
     tmp.email_opens,
@@ -23,6 +23,4 @@ SELECT
 FROM
     temp_sequence_interactions tmp
 JOIN
-    unique_emails ue ON ue.email_address = tmp.email_address
-JOIN
-    prospect_email_link pel ON pel.email_id = ue.email_id;
+    unique_emails ue ON ue.email_address = tmp.email_address;
