@@ -7,5 +7,6 @@ CREATE TABLE email_addresses (
     email_validation_status VARCHAR(255),
     email_source VARCHAR(255),
     unsubscribed BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (prospect_id) REFERENCES prospects(prospect_id)
+    FOREIGN KEY (prospect_id) REFERENCES prospects(prospect_id),
+    FOREIGN KEY (email1_id) REFERENCES unique_emails(email_id)
 );

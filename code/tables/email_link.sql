@@ -1,5 +1,5 @@
 --table to create relationship between email string and prospect_id
-CREATE TABLE prospect_email_links (
+CREATE TABLE prospect_email_link (
     link_id SERIAL PRIMARY KEY,
     prospect_id INTEGER NOT NULL,
     email_address VARCHAR(255) NOT NULL,
