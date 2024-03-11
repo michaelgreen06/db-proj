@@ -1,0 +1,2 @@
+--need to create a script that updates the unsubscribed status when someone unsubscribes
+--May also want to unsubscribe all of the other email_address's associated with their prospect_id
