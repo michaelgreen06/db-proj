@@ -1,4 +1,6 @@
 --PROGRESSIVE FILTERING W/ CTEs
+--3/11/24 - this script works but the results don't work great because they don't acccount for the
+--many to one relationship of prospect_id's to prospects
 
 --Filter 1 valid_emails
 CREATE TEMP TABLE test AS 
