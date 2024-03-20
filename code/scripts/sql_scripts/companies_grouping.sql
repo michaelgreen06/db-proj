@@ -34,6 +34,7 @@ GROUP BY pel.email_id
 HAVING COUNT(pel.prospect_id) > 1;
 
 -- Insert entries for email_ids associated with a single prospect_id
+--doing stuff
 INSERT INTO companies (name, email_id)
 SELECT p.name, pel.email_id
 FROM prospect_email_link pel
