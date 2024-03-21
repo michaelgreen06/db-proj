@@ -23,7 +23,7 @@ def delete_invalid_emails():
         # SQL query to delete entries with invalid email addresses
         delete_query = """
         DELETE FROM email_addresses
-        WHERE email_address SIMILAR TO '%(@yourdomain\.com|@domain\.com|@yoursite\.com|\.gov|\.gov\.au|\.linktr\.ee|facebook\.com|instagram\.com)%'
+        WHERE email_address SIMILAR TO '%(@yourdomain\.com|@domain\.com|@yoursite\.com|\.gov|\.gov\.au|\.linktr\.ee|facebook\.com|instagram\.com|email\.com|\.us|kcmo\.org|\.edu|\.fda\.hhs|godaddy\.com)%'
         """
         cur.execute(delete_query)
 
