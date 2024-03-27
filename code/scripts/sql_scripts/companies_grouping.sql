@@ -44,5 +44,33 @@ WHERE c.company_id IS NULL
 GROUP BY pel.email_id, p.name
 HAVING COUNT(pel.prospect_id) = 1;
 
+--cypher code
+--returns a list of prospect_id's associated with each email_id
+MATCH (p:Prospect)-[:HAS_EMAIL]->(e:Email)
+WITH e, COLLECT(p) AS prospects
+WHERE SIZE(prospects) > 1
+WITH e, prospects, SIZE(prospects) AS size
+UNWIND prospects AS prospect
+MATCH (prospect)-[:HAS_EMAIL]->(e2:Email)
+WITH e, prospect, COLLECT(e2) AS emails, size
+WHERE SIZE(emails) = 1
+WITH e, COLLECT(prospect) AS uniqueProspects, size
+WHERE SIZE(uniqueProspects) = size
+RETURN e.id AS email_id, [p IN uniqueProspects | p.id] AS shared_prospects
+
+--cypher code
+--same as above but includes relationships so the visualizer can be used
+MATCH (p:Prospect)-[r:HAS_EMAIL]->(e:Email)
+WITH e, COLLECT(p) AS prospects, COLLECT(r) AS relationships
+WHERE SIZE(prospects) > 1
+WITH e, prospects, relationships, SIZE(prospects) AS size
+UNWIND prospects AS prospect
+MATCH (prospect)-[r2:HAS_EMAIL]->(e2:Email)
+WITH e, prospect, COLLECT(e2) AS emails, size, relationships
+WHERE SIZE(emails) = 1
+WITH e, COLLECT(prospect) AS uniqueProspects, size, relationships
+WHERE SIZE(uniqueProspects) = size
+RETURN e, uniqueProspects, relationships
+
 
 
