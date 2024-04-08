@@ -35,6 +35,7 @@ unemailed_prospects AS (
     )
 ),
 --Filter 5 exclude_shared_emails
+--excludes email_ids that are linked to more than one prospect_id in the prospect_email_link table
 exclude_shared_emails AS (
     SELECT up.prospect_id
     FROM unemailed_prospects up
@@ -52,6 +53,7 @@ exclude_shared_emails AS (
     )
 ),
 --Filter 6 single_email_prospects
+--includes only prospects that are associated with exactly one email_id
 single_email_prospects AS (
     SELECT eep.prospect_id
     FROM exclude_shared_emails eep
