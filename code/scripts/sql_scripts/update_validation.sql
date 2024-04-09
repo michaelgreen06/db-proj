@@ -70,3 +70,40 @@ COPY email_validation_temp TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Micha
 -- Drop the temporary tables after use
 DROP TABLE dedup_temp;
 DROP TABLE email_validation_temp;
+
+
+--code from COCV2 Export
+--creates a CSV of email_address's that have 2 to 5 prospect_id's associated with them
+\COPY (
+    SELECT ue.email_address
+    FROM unique_emails ue
+    JOIN (
+        SELECT ea.email_id
+        FROM email_addresses ea
+        JOIN neo4j n ON ea.email_id = n.email_id
+        WHERE ea.email_validation_status IS NULL
+        GROUP BY ea.email_id
+        HAVING COUNT(DISTINCT n.prospect_id) BETWEEN 2 AND 5
+    ) AS filtered_emails ON ue.email_id = filtered_emails.email_id
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/email_validation/to_validate/4_9_24.csv' WITH CSV HEADER;
+
+--creates a csv of email_address's that have an email_validation status of Null & aren't in the above CSV
+\COPY (
+    SELECT email_address
+    FROM email_addresses
+    WHERE email_validation_status IS NULL
+    AND NOT EXISTS (
+        SELECT 1
+        FROM unique_emails ue
+        INNER JOIN (
+            SELECT ea.email_id
+            FROM email_addresses ea
+            JOIN neo4j n ON ea.email_id = n.email_id
+            WHERE ea.email_validation_status IS NULL
+            GROUP BY ea.email_id
+            HAVING COUNT(DISTINCT n.prospect_id) BETWEEN 2 AND 5
+        ) AS filtered_emails ON ue.email_id = filtered_emails.email_id
+        WHERE email_addresses.email_id = ue.email_id
+    )
+    LIMIT 780
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/email_validation/to_validate/4_9_24(a).csv' WITH CSV HEADER;

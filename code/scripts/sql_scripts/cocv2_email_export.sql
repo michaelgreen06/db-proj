@@ -1,6 +1,18 @@
 -- CTE's with a progressive filter that focuses on prospect_id instead of email_id
 -- 3/11/24 - used this script to export COCV1
 
+--filter1: only include valid emails
+--filter2: filter by category
+--filter3: filter by location
+--filter4: ensure they weren't in COCV0
+--filter5: email_ids that are associated with 2 or 3 prospect_id's
+--output email_address instead of email_id
+
+
+
+
+--Previous code:--
+
 --Filter 1 valid_emails
 CREATE TEMP TABLE test AS 
 WITH valid_prospect_ids AS (
