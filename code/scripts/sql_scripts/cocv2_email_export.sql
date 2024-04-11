@@ -8,6 +8,35 @@
 --filter5: email_ids that are associated with 2 or 3 prospect_id's
 --output email_address instead of email_id
 
+--new code:
+CREATE TEMP TABLE test AS 
+WITH valid_prospect_ids AS (
+    SELECT prospect_id
+    FROM email_addresses
+    WHERE email_validation_status = 'valid'
+),
+filtered_categories AS (
+    SELECT vpi.prospect_id
+    FROM valid_prospect_ids vpi
+    INNER JOIN categories c ON vpi.prospect_id = c.prospect_id
+    WHERE c.category1 = 'Cigar shop' OR c.category1 = 'Hookah store' OR c.category1 = 'Vaporizer store' OR c.category1 = 'Glass shop'
+),
+filtered_locations AS (
+    SELECT fc.prospect_id 
+    FROM filtered_categories fc
+    INNER JOIN locations l ON fc.prospect_id = l.prospect_id
+    WHERE l.state NOT IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+    AND l.state IS NOT NULL
+),
+-- Adjusted Filter 4: filtered_email_ids using neo4j
+filtered_email_ids AS (
+    SELECT n.email_id
+    FROM neo4j n
+    INNER JOIN filtered_locations fl ON n.prospect_id = fl.prospect_id
+    GROUP BY n.email_id
+    HAVING COUNT(n.prospect_id) BETWEEN 2 AND 5
+)
+SELECT * FROM filtered_email_ids;
 
 
 
