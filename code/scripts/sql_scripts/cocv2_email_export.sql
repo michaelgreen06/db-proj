@@ -1,3 +1,60 @@
+--New Approach
+--returns list of email_ids that ARE IN specific states
+WITH state_filtered AS (
+    SELECT prospect_id
+    FROM locations
+    WHERE state IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+), --2995
+category_filtered AS (
+    SELECT sf.prospect_id
+    FROM state_filtered sf
+    INNER JOIN categories c ON sf.prospect_id = c.prospect_id
+    WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop')
+),--358
+email_linked AS (
+    SELECT DISTINCT pel.email_id
+    FROM category_filtered cf
+    INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
+),--23
+email_count_filtered AS (
+    SELECT el.email_id
+    FROM email_linked el
+    INNER JOIN neo4j n ON el.email_id = n.email_id
+    GROUP BY el.email_id
+    HAVING COUNT(n.prospect_id) BETWEEN 2 AND 5
+)
+SELECT COUNT (*) AS email_id_count 
+FROM email_count_filtered;
+
+--returns list of email_ids that ARE NOT IN specific states
+WITH state_filtered AS (
+    SELECT prospect_id
+    FROM locations
+    WHERE state NOT IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+), --11083
+category_filtered AS (
+    SELECT sf.prospect_id
+    FROM state_filtered sf
+    INNER JOIN categories c ON sf.prospect_id = c.prospect_id
+    WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop', 'Liquor store')
+),--1373
+email_linked AS (
+    SELECT DISTINCT pel.email_id
+    FROM category_filtered cf
+    INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
+),--751
+email_count_filtered AS (
+    SELECT el.email_id
+    FROM email_linked el
+    INNER JOIN neo4j n ON el.email_id = n.email_id
+    GROUP BY el.email_id
+    HAVING COUNT(n.prospect_id) BETWEEN 2 AND 5
+)--70
+SELECT COUNT (*) AS email_id_count 
+FROM email_count_filtered;
+
+
+
 -- CTE's with a progressive filter that focuses on prospect_id instead of email_id
 -- 3/11/24 - used this script to export COCV1
 
@@ -7,6 +64,35 @@
 --filter4: ensure they weren't in COCV0
 --filter5: email_ids that are associated with 2 or 3 prospect_id's
 --output email_address instead of email_id
+
+--this code returns a count of all prospect_ids that don't show up in the neo4j table
+WITH valid_prospect_ids AS (
+    SELECT prospect_id
+    FROM email_addresses
+    WHERE email_validation_status = 'valid'
+),
+filtered_categories AS (
+    SELECT vpi.prospect_id
+    FROM valid_prospect_ids vpi
+    INNER JOIN categories c ON vpi.prospect_id = c.prospect_id
+    WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop')
+),
+filtered_locations AS (
+    SELECT fc.prospect_id 
+    FROM filtered_categories fc
+    INNER JOIN locations l ON fc.prospect_id = l.prospect_id
+    WHERE l.state NOT IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+    AND l.state IS NOT NULL
+)
+SELECT COUNT(fl.prospect_id) AS missing_prospect_count
+FROM filtered_locations fl
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM neo4j nt
+    WHERE fl.prospect_id = nt.prospect_id
+);
+
+
 
 --new code:
 CREATE TEMP TABLE test AS 
