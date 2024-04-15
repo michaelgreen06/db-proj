@@ -80,6 +80,45 @@ email_addresses_resolved AS (
 SELECT * FROM email_addresses_resolved;
 
 
+--testing results of last filter
+COPY (
+    WITH state_filtered AS (
+        SELECT prospect_id
+        FROM locations
+        WHERE state NOT IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+    ),
+    category_filtered AS (
+        SELECT sf.prospect_id
+        FROM state_filtered sf
+        INNER JOIN categories c ON sf.prospect_id = c.prospect_id
+        WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop','Cannabis store','Hydroponics equipment supplier','Herbal medicine store','Tobacco supplier','Adult entertainment store','Record store','Beer store','Glassware store','Hookah bar')
+    ),
+    email_linked AS (
+        SELECT DISTINCT pel.email_id
+        FROM category_filtered cf
+        INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
+    ),
+    email_count_filtered AS (
+        SELECT DISTINCT el.email_id
+        FROM email_linked el
+        INNER JOIN neo4j n ON el.email_id = n.email_id
+        GROUP BY el.email_id
+        HAVING COUNT(n.prospect_id) BETWEEN 2 AND 5
+    ),
+    validated_emails AS (
+        SELECT DISTINCT ecf.email_id
+        FROM email_count_filtered ecf
+        INNER JOIN email_addresses ea ON ecf.email_id = ea.email_id
+        WHERE ea.email_validation_status = 'valid'
+    ),
+    email_addresses_resolved AS (
+        SELECT vm.email_id, ue.email_address
+        FROM validated_emails vm
+        INNER JOIN unique_emails ue ON vm.email_id = ue.email_id
+    )
+    SELECT * FROM email_addresses_resolved
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/cocv2c.csv' WITH CSV HEADER;
+
 
 -- CTE's with a progressive filter that focuses on prospect_id instead of email_id
 -- 3/11/24 - used this script to export COCV1

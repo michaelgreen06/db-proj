@@ -4,7 +4,7 @@ COPY (
     FROM email_addresses
     WHERE email_validation_status IS NULL
 --change CSV file name to today's date
-) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/email_validation/to_validate/4_13_24.csv' WITH CSV HEADER;
+) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/email_validation/to_validate/4_15_24c.csv' WITH CSV HEADER;
 
 --step_2 run results through snov or other email address validation service
 --step_3 copy paste validation results into .../1-9/@3GD/Marketing/Email Marketing/B2B/Email-verification/Results/all_results.csv
@@ -31,7 +31,7 @@ SET
 FROM
     email_validation_temp evt
 WHERE
-    ea.email_address = evt.email_address;
+    LOWER(ea.email_address) = LOWER(evt.email_address);
 
 --delete temp table
 DROP TABLE email_validation_temp;
