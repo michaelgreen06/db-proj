@@ -33,5 +33,7 @@ COPY (
         LOWER(email_address) NOT LIKE '%msn%' AND
         LOWER(email_address) NOT LIKE '%joint%' AND
         LOWER(email_address) NOT LIKE '%cbd%' AND
+        LOWER(email_address) NOT LIKE '%email.com%' AND
+        LOWER(email_address) NOT LIKE '%protonmail.com%' AND
         LOWER(email_address) NOT LIKE '%glass%'
 ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/email_enrichment/4-17-24A.csv' WITH CSV HEADER;
