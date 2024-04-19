@@ -35,5 +35,28 @@ COPY (
         LOWER(email_address) NOT LIKE '%cbd%' AND
         LOWER(email_address) NOT LIKE '%email.com%' AND
         LOWER(email_address) NOT LIKE '%protonmail.com%' AND
+        LOWER(email_address) NOT LIKE '%att.com%' AND
+        LOWER(email_address) NOT LIKE '%email.com%' AND
+        LOWER(email_address) NOT LIKE '%foxmail.com%' AND
+        LOWER(email_address) NOT LIKE '%bellsouth.net%' AND
+        LOWER(email_address) NOT LIKE '%sbcglobal.net%' AND
+        LOWER(email_address) NOT LIKE '%verizon.net%' AND
+        LOWER(email_address) NOT LIKE '%att.net%' AND
         LOWER(email_address) NOT LIKE '%glass%'
 ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/email_enrichment/4-17-24A.csv' WITH CSV HEADER;
+
+--process for deleting emails based on domains w/ no matching keywords
+--create the table to store the list of domains
+CREATE TEMP TABLE domain_list (
+    domain_name VARCHAR(255)
+);
+
+--populate the table with domains from the CSV
+\copy domain_list(domain_name) FROM '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/email_enrichment/domains2delete.csv' CSV HEADER;
+
+--delete email addresses that contain matching domains:
+SELECT email_address FROM email_addresses
+WHERE RIGHT(email_address, LENGTH(email_address) - POSITION('@' IN email_address)) IN (
+    SELECT domain_name FROM domain_list
+);
+
