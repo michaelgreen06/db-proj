@@ -1,8 +1,8 @@
 --if bu table already exists will have to drop it before creating backup (I think*)
 --using LIKE means that constraints, indexes etc are also copied to the new table
-CREATE TABLE email_addresses_bu (LIKE email_addresses INCLUDING ALL);
+CREATE TABLE prospect_email_link_bu (LIKE prospect_email_link INCLUDING ALL);
 --insert puts the data from the original table into the new table
-INSERT INTO email_addresses_bu SELECT * FROM email_addresses;
+INSERT INTO prospect_email_link_bu SELECT * FROM prospect_email_link;
 
 
 --this command copies the table without constraints

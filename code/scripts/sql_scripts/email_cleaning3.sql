@@ -102,6 +102,7 @@ COPY (
     -- End Sub
 
 --8). Move the email_addresses to the questionable_email_addresses table
+--alternative approach would be to add a new status column in email_addresses table which IDs emails as questionable
 --create the questionable_emails table
 CREATE TABLE questionable_emails AS
 SELECT *
