@@ -1,4 +1,5 @@
 --1). export a CSV of email_addresses to be evaluated. 
+--next time include all email_addresses to be evaluated
 COPY (
     SELECT DISTINCT email_address
     FROM email_addresses
