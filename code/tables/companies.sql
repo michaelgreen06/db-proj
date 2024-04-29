@@ -1,9 +1,11 @@
---copy values from neo4j then put into excel & use find & replace to change [] to {}
+--export values from neo4j to csv & use find & replace to change [] to {}
+--also need to add company_id column and populate w/ increment values EG 1,2,3 etc
+--must delete top row of company_id, email_id etc
 --save as csv then open the csv in vs code, copy the content and save as a new csv file
 --use the csv file saved from vscode to import into postgress because excel file causes errors
 
 -- create table
-CREATE TABLE neo4j (
+CREATE TABLE companies (
     neo4j_id SERIAL PRIMARY KEY,
     company_id INTEGER,
     email_id INTEGER,
@@ -22,16 +24,19 @@ CREATE TEMP TABLE temp_data_load (
 
 --insert neo4j results w/ array values into temp table
 COPY temp_data_load(company_id, email_id, prospect_ids)
-FROM '/Users/michaelgreen/udemy/db-proj/scripts/code/scripts/sql_scripts/neo4j.csv' WITH (FORMAT csv, DELIMITER ',', ENCODING 'UTF8');
+FROM '/Users/michaelgreen/udemy/db-proj/scripts/code/scripts/neo4j/companies.csv' WITH (FORMAT csv, DELIMITER ',', ENCODING 'UTF8');
 
 --insert flattened data into neo4j table
-INSERT INTO neo4j (company_id, email_id, prospect_id)
+INSERT INTO companies (company_id, email_id, prospect_id)
 SELECT
     company_id,
     email_id,
     unnest(prospect_ids)
 FROM
     temp_data_load;
+
+--not sure how relevant the below code is
+--pretty sure it is irrelevant because this logic is now covered by the new email export scripts    
 
 --return email_ids of companies w/ 2 or 3 prospects
 SELECT email_id

@@ -4,7 +4,6 @@ COPY (
     SELECT DISTINCT email_address
     FROM email_addresses
     WHERE
-        email_validation_status = 'valid' AND
         LOWER(email_address) NOT LIKE '%smoke%' AND
         LOWER(email_address) NOT LIKE '%vape%' AND
         LOWER(email_address) NOT LIKE '%tobacco%' AND
