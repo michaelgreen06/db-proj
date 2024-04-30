@@ -1,83 +1,114 @@
---New Approach
+--filter1
 --returns list of email_ids that ARE IN specific states
---This code is for all applicable stores that aren't Tobacco Shops or Smoke shops
+    CREATE TEMP TABLE filter1 AS
+    WITH state_filtered AS (
+        SELECT prospect_id
+        FROM locations
+        WHERE state IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+    ), --2995
+    category_filtered AS (
+        SELECT sf.prospect_id
+        FROM state_filtered sf
+        INNER JOIN categories c ON sf.prospect_id = c.prospect_id
+        WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop','Cannabis store','Hydroponics equipment supplier','Herbal medicine store','Tobacco supplier','Adult entertainment store','Record store','Beer store','Glassware store','Hookah bar')
+    ),--358
+    email_linked AS (
+        SELECT DISTINCT pel.email_id
+        FROM category_filtered cf
+        INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
+    ),--23
+    email_count_filtered AS (
+        SELECT DISTINCT el.email_id
+        FROM email_linked el
+        INNER JOIN companies n ON el.email_id = n.email_id
+        GROUP BY el.email_id
+        HAVING COUNT(n.prospect_id) BETWEEN 1 AND 5
+    ),
+    validated_emails AS (
+        SELECT DISTINCT ecf.email_id
+        FROM email_count_filtered ecf
+        INNER JOIN email_addresses ea ON ecf.email_id = ea.email_id
+        WHERE ea.email_validation_status = 'valid'
+    ),
+    email_addresses_resolved AS (
+        SELECT vm.email_id, ue.email_address
+        FROM validated_emails vm
+        INNER JOIN unique_emails ue ON vm.email_id = ue.email_id
+    )
+    SELECT * FROM email_addresses_resolved;
 
-WITH state_filtered AS (
-    SELECT prospect_id
-    FROM locations
-    WHERE state IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
-), --2995
-category_filtered AS (
-    SELECT sf.prospect_id
-    FROM state_filtered sf
-    INNER JOIN categories c ON sf.prospect_id = c.prospect_id
-    WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop','Cannabis store','Hydroponics equipment supplier','Herbal medicine store','Tobacco supplier','Adult entertainment store','Record store','Beer store','Glassware store','Hookah bar')
-),--358
-email_linked AS (
-    SELECT DISTINCT pel.email_id
-    FROM category_filtered cf
-    INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
-),--23
-email_count_filtered AS (
-    SELECT DISTINCT el.email_id
-    FROM email_linked el
-    INNER JOIN neo4j n ON el.email_id = n.email_id
-    GROUP BY el.email_id
-    HAVING COUNT(n.prospect_id) BETWEEN 2 AND 5
-),
-validated_emails AS (
-    SELECT DISTINCT ecf.email_id
-    FROM email_count_filtered ecf
-    INNER JOIN email_addresses ea ON ecf.email_id = ea.email_id
-    WHERE ea.email_validation_status = 'valid'
-),
-email_addresses_resolved AS (
-    SELECT vm.email_id, ue.email_address
-    FROM validated_emails vm
-    INNER JOIN unique_emails ue ON vm.email_id = ue.email_id
-)
-SELECT * FROM email_addresses_resolved;
-
---This code shows how to get a count from the above code instead of the actual email_ids
-SELECT COUNT (*) AS validated_emails_count 
-FROM validated_emails;
-
+--filter2
 --returns list of valid email_ids that ARE NOT IN specific states
-WITH state_filtered AS (
-    SELECT prospect_id
-    FROM locations
-    WHERE state NOT IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
-), --2995
-category_filtered AS (
-    SELECT sf.prospect_id
-    FROM state_filtered sf
-    INNER JOIN categories c ON sf.prospect_id = c.prospect_id
-    WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop','Cannabis store','Hydroponics equipment supplier','Herbal medicine store','Tobacco supplier','Adult entertainment store','Record store','Beer store','Glassware store','Hookah bar')
-),--358
-email_linked AS (
-    SELECT DISTINCT pel.email_id
-    FROM category_filtered cf
-    INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
-),--23
-email_count_filtered AS (
-    SELECT DISTINCT el.email_id
-    FROM email_linked el
-    INNER JOIN neo4j n ON el.email_id = n.email_id
-    GROUP BY el.email_id
-    HAVING COUNT(n.prospect_id) BETWEEN 2 AND 5
-),
-validated_emails AS (
-    SELECT DISTINCT ecf.email_id
-    FROM email_count_filtered ecf
-    INNER JOIN email_addresses ea ON ecf.email_id = ea.email_id
-    WHERE ea.email_validation_status = 'valid'
-),
-email_addresses_resolved AS (
-    SELECT vm.email_id, ue.email_address
-    FROM validated_emails vm
-    INNER JOIN unique_emails ue ON vm.email_id = ue.email_id
-)
-SELECT * FROM email_addresses_resolved;
+    CREATE TEMP TABLE filter2 AS
+    WITH state_filtered AS (
+        SELECT prospect_id
+        FROM locations
+        WHERE state NOT IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+    ), --2995
+    category_filtered AS (
+        SELECT sf.prospect_id
+        FROM state_filtered sf
+        INNER JOIN categories c ON sf.prospect_id = c.prospect_id
+        WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop','Cannabis store','Hydroponics equipment supplier','Herbal medicine store','Tobacco supplier','Adult entertainment store','Record store','Beer store','Glassware store','Hookah bar')
+    ),--358
+    email_linked AS (
+        SELECT DISTINCT pel.email_id
+        FROM category_filtered cf
+        INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
+    ),--23
+    email_count_filtered AS (
+        SELECT DISTINCT el.email_id
+        FROM email_linked el
+        INNER JOIN companies n ON el.email_id = n.email_id
+        GROUP BY el.email_id
+        HAVING COUNT(n.prospect_id) BETWEEN 1 AND 5
+    ),
+    validated_emails AS (
+        SELECT DISTINCT ecf.email_id
+        FROM email_count_filtered ecf
+        INNER JOIN email_addresses ea ON ecf.email_id = ea.email_id
+        WHERE ea.email_validation_status = 'valid'
+    ),
+    email_addresses_resolved AS (
+        SELECT vm.email_id, ue.email_address
+        FROM validated_emails vm
+        INNER JOIN unique_emails ue ON vm.email_id = ue.email_id
+    )
+    SELECT * FROM email_addresses_resolved;
+
+--filter3
+--removes previously contacted prospects from the output of filter1 or filter2
+    --step 1
+    CREATE TEMP TABLE contacted (email_address VARCHAR(255));
+    --step 2
+    COPY contacted(email_address) FROM '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/contacted/all_contacted.csv' CSV HEADER;
+    --step 3
+    COPY (
+    SELECT email_address
+    FROM filter1
+    WHERE email_address NOT IN (SELECT email_address FROM contacted)
+    ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/cocv2a.csv' WITH CSV HEADER;
+    --step4 cleanup
+    DROP TABLE filter1;
+    DROP TABLE contacted;
+
+--filter4
+--removes previously contacted prospects from the output of filter2
+    --step 1
+    CREATE TEMP TABLE contacted (email_address VARCHAR(255));
+    --step 2
+    COPY contacted(email_address) FROM '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/ready4snov/contacted/all_contacted.csv' CSV HEADER;
+    --step 3
+    COPY (
+    SELECT email_address
+    FROM filter2
+    WHERE email_address NOT IN (SELECT email_address FROM contacted)
+    ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/ready4snov/cocv2b.csv' WITH CSV HEADER;
+    --step4 cleanup
+    DROP TABLE filter2;
+    DROP TABLE contacted;
+
+
 
 
 --testing results of last filter
