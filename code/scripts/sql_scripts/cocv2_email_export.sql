@@ -4,19 +4,19 @@
     WITH state_filtered AS (
         SELECT prospect_id
         FROM locations
-        WHERE state IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
-    ), --2995
+        WHERE state IN ('AZ', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+    ),
     category_filtered AS (
         SELECT sf.prospect_id
         FROM state_filtered sf
         INNER JOIN categories c ON sf.prospect_id = c.prospect_id
         WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop','Cannabis store','Hydroponics equipment supplier','Herbal medicine store','Tobacco supplier','Adult entertainment store','Record store','Beer store','Glassware store','Hookah bar')
-    ),--358
+    ),
     email_linked AS (
         SELECT DISTINCT pel.email_id
         FROM category_filtered cf
         INNER JOIN prospect_email_link pel ON cf.prospect_id = pel.prospect_id
-    ),--23
+    ),
     email_count_filtered AS (
         SELECT DISTINCT el.email_id
         FROM email_linked el
@@ -43,13 +43,13 @@
     WITH state_filtered AS (
         SELECT prospect_id
         FROM locations
-        WHERE state NOT IN ('AZ', 'CO', 'FL', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
+        WHERE state NOT IN ('AZ', 'AR', 'IL', 'IA', 'ME', 'UT', 'VT', 'WA')
     ), --2995
     category_filtered AS (
         SELECT sf.prospect_id
         FROM state_filtered sf
         INNER JOIN categories c ON sf.prospect_id = c.prospect_id
-        WHERE c.category1 IN ('Cigar shop', 'Hookah store', 'Vaporizer store', 'Glass shop','Cannabis store','Hydroponics equipment supplier','Herbal medicine store','Tobacco supplier','Adult entertainment store','Record store','Beer store','Glassware store','Hookah bar')
+        WHERE c.category1 IN ('Smoke shop', 'Tobacco shop')
     ),--358
     email_linked AS (
         SELECT DISTINCT pel.email_id
@@ -77,7 +77,7 @@
     SELECT * FROM email_addresses_resolved;
 
 --filter3
---removes previously contacted prospects from the output of filter1 or filter2
+--removes previously contacted prospects from the output of filter1 
     --step 1
     CREATE TEMP TABLE contacted (email_address VARCHAR(255));
     --step 2
@@ -103,10 +103,38 @@
     SELECT email_address
     FROM filter2
     WHERE email_address NOT IN (SELECT email_address FROM contacted)
-    ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/ready4snov/cocv2b.csv' WITH CSV HEADER;
+    ) TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/ready4snov/cocv2d.csv' WITH CSV HEADER;
     --step4 cleanup
     DROP TABLE filter2;
     DROP TABLE contacted;
+
+--filter5
+--compares lists and removes duplicates from 1
+    --1). create the temp tables to hold the lists
+    CREATE TEMP TABLE cocv2b (
+        email_address VARCHAR(255)
+    );
+
+    CREATE TEMP TABLE cocv2d (
+        email_address VARCHAR(255)
+    );
+
+    --2). import csvs into temp tables
+    COPY cocv2b(email_address) FROM '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/ready4snov/cocv2b.csv' WITH CSV HEADER;
+    COPY cocv2d(email_address) FROM '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/ready4snov/cocv2d.csv' WITH CSV HEADER;
+
+    --3). remove duplicates from cocv2d
+    DELETE FROM cocv2d
+    WHERE EXISTS (
+        SELECT 1
+        FROM cocv2b
+        WHERE cocv2b.email_address = cocv2d.email_address
+    );
+
+    --4). export updated cocv2d csv
+    COPY cocv2d TO '/Users/michaelgreen/Desktop/DESKTOP-TAVS9M6/Michael Orig/1-9/@3GD/Marketing/Email Marketing/B2B/Email Lists/ready4snov/modified_cocv2d.csv' WITH CSV HEADER;
+
+
 
 
 
